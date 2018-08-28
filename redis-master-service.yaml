@@ -1,0 +1,21 @@
+# Laimis - This file contains configuration to deploy a Service for the Redis master. A Kubernetes service is a named load balancer that proxies traffic to one or more containers. This is done using the labels metadata that we defined in the redis-master pod. As mentioned, we have only one Redis master, but we nevertheless want to create a service for it. Why? Because it gives us a deterministic way to route to the single master using an elastic IP.
+
+# Laimis - Services find the pods to load balance based on the pods' labels. The selector: field of the service description determines which pods will receive the traffic sent to the service, and the port: and targetPort: information defines what port the service proxy will run at.
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master
+  labels:
+    app: redis
+    role: master
+    tier: backend
+spec:
+  ports:
+    # the port that this service should serve on
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis
+    role: master
+    tier: backend

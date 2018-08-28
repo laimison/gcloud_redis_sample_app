@@ -1,0 +1,39 @@
+apiVersion: v1
+# Laimis - Although we have a single instance of our redis master, we are using a Replication Controller to enforce that exactly one pod keeps running. E.g., if the node were to go down, the replication controller will ensure that the redis master gets restarted on a healthy node. (In our simplified example, this could result in data loss.)
+kind: ReplicationController
+# Laimis - The metadata: sections define labels to apply to the Replication Controller and related Pods. Labels are simple key-value pairs, which can be queried by other operations.
+metadata:
+  name: redis-master
+  # these labels can be applied automatically 
+  # from the labels in the pod template if not set
+  labels:
+    app: redis
+    role: master
+    tier: backend
+# Laimis - Here we define the Pod specification which the Replication Controller will use to create the Redis pod. The image: tag refers to a Docker image to be pulled from a registry.
+spec:
+  # this replicas value is default
+  # modify it according to your case
+  replicas: 1
+  # selector can be applied automatically 
+  # from the labels in the pod template if not set
+  # selector:
+  #   app: guestbook
+  #   role: master
+  #   tier: backend
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        tier: backend
+    spec:
+      containers:
+      - name: master
+        image: gcr.io/google_containers/redis:e2e  # or just image: redis
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        ports:
+        - containerPort: 6379
